@@ -1,11 +1,13 @@
 package tech.zuosi.bookmarkmanager.listener;
 
+import tech.zuosi.bookmarkmanager.SelectedText;
 import tech.zuosi.bookmarkmanager.util.DataManager;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.BadLocationException;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -30,10 +32,6 @@ public class textMenuListener extends MouseAdapter implements CaretListener {
         isEditMode = editMode;
     }
 
-    public String formatJson(String src) {
-        return src.replaceAll("\\\\n","\n     ").replace("{","").replace("}","").replaceAll(",","\n").replaceAll("\":\"","->\n     ").replaceAll("\"","");
-    }
-
     public void caretUpdate(CaretEvent ce) {
         if (textArea.getText().trim().length() == 0)
             return;
@@ -54,9 +52,8 @@ public class textMenuListener extends MouseAdapter implements CaretListener {
             if (me.getClickCount() == 2) {
                 String str = textArea.getText();
                 String[] strArray = str.split("\n");
-                tarTitle = strArray[line].trim();
-                textArea.setText(formatJson(DataManager.dataIndex.get(tarTitle)));
-                this.setEditMode(false);
+                tarTitle = strArray[line].trim().split("\\.")[1];  //To Skip Index
+                SelectedText.text = tarTitle;
             }
             // FIXME 暂时无法导出为可执行jar
         }
