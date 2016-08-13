@@ -35,9 +35,10 @@ public class UIpanel {
         jFrame.setVisible(true);
         jFrame.add(new tabPane());
         jFrame.pack();
-        // FIXME 初始界面的大小
+        jFrame.setResizable(false);
         // TODO 加入右键菜单（非必要）
         // TODO 加入快捷键
         // TODO 重构，性能优化
+        //TODO 将各种功能封装
     }
 }
