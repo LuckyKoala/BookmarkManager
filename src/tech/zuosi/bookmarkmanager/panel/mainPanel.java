@@ -2,12 +2,14 @@ package tech.zuosi.bookmarkmanager.panel;
 
 import com.google.gson.Gson;
 import tech.zuosi.bookmarkmanager.SelectedText;
+import tech.zuosi.bookmarkmanager.data.BookmarkInfo;
+import tech.zuosi.bookmarkmanager.data.DataManager;
 import tech.zuosi.bookmarkmanager.listener.textMenuListener;
-import tech.zuosi.bookmarkmanager.util.BookmarkInfo;
-import tech.zuosi.bookmarkmanager.util.DataManager;
+import tech.zuosi.bookmarkmanager.type.ModeType;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 
 /**
@@ -26,6 +28,7 @@ public class mainPanel extends JPanel {
     private JButton edit = new JButton("编辑");
     private JButton save = new JButton("保存");
     private JButton reload = new JButton("重置");
+    private JButton exit = new JButton("退出");
     private JScrollPane scrollInfoPane = new JScrollPane(info,
             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     private JLabel messageLab = new JLabel("点击编辑按钮查看已有内容");
@@ -36,6 +39,7 @@ public class mainPanel extends JPanel {
             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     private textMenuListener tml = new textMenuListener(content);
     private Font textFont = new Font("Serief",Font.BOLD,13);
+    public static ModeType currentMode = ModeType.NEW;
 
     public mainPanel() {
         this.setLayout(gridBagLayout);
@@ -44,15 +48,19 @@ public class mainPanel extends JPanel {
     }
 
     private void initActionListener() {
+        //TODO 读取后，右边有内容的时候，增加一种可以保存该次修改而不直接退出编辑模式的按钮，最好更新更多按钮，将frame显示区域扩大
         // TODO 监听事件，info.getText().getBytes().length <= 119/或是增加横向滚动栏
+        //TODO 多线程更新text
+        //TODO 目前程序似乎直接关闭窗口，进程仍存在
+        //FIXME 导出的jar直接运行似乎无法正常读取数据
         this.add.addActionListener(e -> {
-            if (tml.isEditMode())
+            if (ModeType.NEW != currentMode)
                 return;
             if ("".equals(url.getText()) || "".equals(title.getText()) || "".equals(info.getText())) {
                 messageLab.setText("内容不能为空");
             } else {
                 try {
-                    new DataManager(new BookmarkInfo(url.getText(), title.getText(), info.getText())).writeData();
+                    new DataManager(new BookmarkInfo(url.getText(), title.getText(), info.getText())).writeData(false);
                 } catch (IOException exc) {
                     exc.printStackTrace();
                 }
@@ -63,11 +71,10 @@ public class mainPanel extends JPanel {
                 info.setText("");
                 String alertMessage = "可以添加，移除，查看书签哦\r\n目前还没有完成_(:з」∠)_\r\n内容已重置";
                 JOptionPane.showMessageDialog(this, alertMessage, "书签精灵QAQ", -1);
-                //if ("".equals(url.getText()) || "".equals(title.getText()) || "".equals(info.getText()))
-                    //messageLab.setText("已经重置所有待录入的内容！");
             }
         });
-        this.reload.addActionListener(e -> {
+
+        this.reload.addActionListener((ActionEvent e) -> {
             title.setText("");
             url.setText("");
             info.setText("");
@@ -76,26 +83,27 @@ public class mainPanel extends JPanel {
             if ("".equals(url.getText()) || "".equals(title.getText()) || "".equals(info.getText()))
                 messageLab.setText("已经重置所有待录入的内容！");
         });
+
         this.edit.addActionListener(e -> {
             this.remove(edit);
             instanceConstraints(delete,2,6,3,2);
             this.remove(add);
             instanceConstraints(readAndLoad,0,6,3,2);
-            messageLab.setText("编辑程式正在运行.");
+
+            messageLab.setText("点击保存即可切换为新增模式");
             String alertMessage = "双击选中然后选中读取或删除即可\r\n编辑完点击保存即可切换为新增模式，\r\n" +
                     "在编辑模式下将无法新增书签\r\n么么扎_(:з」∠)_";
             JOptionPane.showMessageDialog(this, alertMessage, "书签精灵0A0", -1);
-            //title.setEditable(false);
-            //url.setEditable(false);
-            //info.setEditable(false);
+
             content.setText(new DataManager().listDataIndex());
-            tml.setEditMode(true);
+            currentMode = ModeType.LIST;
+            //tml.setEditMode(true);
 
             this.readAndLoad.addActionListener(e2 -> {
                 String jsonString = DataManager.dataIndex.get(SelectedText.text);
                 content.setText(SelectedText.formatJson(jsonString));
-                tml.setEditMode(false);
-                //TODO 将内容读取到左边，方便编辑
+                //tml.setEditMode(false);
+                currentMode = ModeType.INFO;
                 BookmarkInfo bookmarkInfo = new Gson().fromJson(jsonString,BookmarkInfo.class);
                 if (bookmarkInfo != null) {
                     title.setText(bookmarkInfo.getTitle());
@@ -104,34 +112,51 @@ public class mainPanel extends JPanel {
                 }
             });
             this.delete.addActionListener(e1 -> {
-                JOptionPane.showMessageDialog(this, "...", "书签精灵0A0", -1);
+                try {
+                    new DataManager(new Gson().fromJson(DataManager.dataIndex.get(SelectedText.text),BookmarkInfo.class)).removeBMI();
+                } catch (IOException e2) {
+                    e2.printStackTrace();
+                }
             });
-            // TODO 点击移除，弹出窗口，输入书签序号即可移除
         });
+
         this.save.addActionListener(e -> {
+            if (ModeType.INFO == currentMode) {
+                if ("".equals(url.getText()) || "".equals(title.getText()) || "".equals(info.getText())) {
+                    messageLab.setText("内容为空,保持原有内容");
+                } else {
+                    boolean hasWritten = false;
+                    try {
+                        hasWritten = new DataManager(new BookmarkInfo(url.getText(),
+                                title.getText(), info.getText())).writeData(true);
+                    } catch (IOException exc) {
+                        exc.printStackTrace();
+                    }
+                    String showTitle = title.getText();
+                    int showTitleLength = showTitle.length();
+                    if (showTitleLength > 6) {
+                        showTitle = showTitle.substring(0,5) + "...";
+                    }
+
+                    if (hasWritten) {
+                        messageLab.setText("数据[" + showTitle + "]存储完毕~");
+                    } else {
+                        messageLab.setText("内容相同，无需更新~");
+                    }
+                }
+            } else if (ModeType.LIST == currentMode) {
+                messageLab.setText("点击编辑按钮查看已有内容");
+            } else {
+                return;
+            }
+
+            content.setEditable(false);
+            content.setText("默认文本\n 如你所见\n  想不想问问隔壁的神奇海螺呢?");
             this.remove(delete);
             instanceConstraints(edit,2,6,3,2);
             this.remove(readAndLoad);
             instanceConstraints(add,0,6,3,2);
-
-            if (tml.isEditMode())
-                return;
-            if ("".equals(url.getText()) || "".equals(title.getText()) || "".equals(info.getText())) {
-                messageLab.setText("内容为空,保持原有内容");
-            } else {
-                try {
-                    new DataManager(new BookmarkInfo(url.getText(), title.getText(), info.getText())).writeData();
-                } catch (IOException exc) {
-                    exc.printStackTrace();
-                }
-                messageLab.setText("数据["+title.getText()+"]存储完毕~");
-            }
-            //title.setEditable(true);
-            //url.setEditable(true);
-            //info.setEditable(true);
-            //messageLab.setText("点击编辑按钮查看已有内容");
-            // FIXME 过长的内容会使得面板变形
-            content.setText("默认文本\n 如你所见\n  想不想问问隔壁的神奇海螺呢?");
+            currentMode = ModeType.NEW;
         });
     }
 
