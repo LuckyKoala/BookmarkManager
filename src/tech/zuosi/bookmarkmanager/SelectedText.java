@@ -6,7 +6,6 @@ package tech.zuosi.bookmarkmanager;
 public class SelectedText {
     public static String text;
 
-    //TODO 获取数据不直观，不好读取
     public static String formatJson(String src) {
         if (src == null) return "";
         return src.replaceAll("\\\\n","\n     ").replace("{","").replace("}","")

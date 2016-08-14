@@ -2,11 +2,9 @@ package tech.zuosi.bookmarkmanager;
 
 
 import tech.zuosi.bookmarkmanager.panel.tabPane;
-import tech.zuosi.bookmarkmanager.util.DataManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 
 /**
  * Created by iwar on 2016/3/4.
