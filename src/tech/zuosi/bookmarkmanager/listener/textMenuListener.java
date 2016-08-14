@@ -1,6 +1,8 @@
 package tech.zuosi.bookmarkmanager.listener;
 
-import tech.zuosi.bookmarkmanager.util.DataManager;
+import tech.zuosi.bookmarkmanager.SelectedText;
+import tech.zuosi.bookmarkmanager.panel.mainPanel;
+import tech.zuosi.bookmarkmanager.type.ModeType;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
@@ -13,26 +15,22 @@ import java.awt.event.MouseEvent;
  * Created by iwar on 2016/3/19.
  */
 public class textMenuListener extends MouseAdapter implements CaretListener {
-    private boolean isEditMode;
+    //private boolean isEditMode;
     private JTextArea textArea;
     private int line;
 
     public textMenuListener(JTextArea textArea) {
         this.textArea = textArea;
-        this.isEditMode = false;
+        //this.isEditMode = false;
     }
 
-    public boolean isEditMode() {
-        return isEditMode;
-    }
+    //public boolean isEditMode() {
+        //return isEditMode;
+    //}
 
-    public void setEditMode(boolean editMode) {
-        isEditMode = editMode;
-    }
-
-    public String formatJson(String src) {
-        return src.replaceAll("\\\\n","\n     ").replace("{","").replace("}","").replaceAll(",","\n").replaceAll("\":\"","->\n     ").replaceAll("\"","");
-    }
+    //public void setEditMode(boolean editMode) {
+        //isEditMode = editMode;
+    //}
 
     public void caretUpdate(CaretEvent ce) {
         if (textArea.getText().trim().length() == 0)
@@ -49,16 +47,14 @@ public class textMenuListener extends MouseAdapter implements CaretListener {
 
     @Override
     public void mouseClicked(MouseEvent me) {
-        if (isEditMode) {
+        if (ModeType.LIST == mainPanel.currentMode) {
             String tarTitle;
             if (me.getClickCount() == 2) {
                 String str = textArea.getText();
                 String[] strArray = str.split("\n");
-                tarTitle = strArray[line].trim();
-                textArea.setText(formatJson(DataManager.dataIndex.get(tarTitle)));
-                this.setEditMode(false);
+                tarTitle = strArray[line].trim().split("\\.")[1];  //To Skip Index
+                SelectedText.text = tarTitle;
             }
-            // FIXME 暂时无法导出为可执行jar
         }
     }
 }

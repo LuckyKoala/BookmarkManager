@@ -27,14 +27,21 @@ public class DataManager {
 
     public boolean writeData() throws IOException {
         if (dataIndex.containsKey(bookmarkInfo.getTitle())) {
-            return false;
+            BookmarkInfo pre = gson.fromJson(dataIndex.get(bookmarkInfo.getTitle()),BookmarkInfo.class);
+            if (pre.getBIID().equals(bookmarkInfo.getBIID())) {
+                System.out.println("pre:" + pre.getBIID() + " | " + "now:" + bookmarkInfo.getBIID());
+                return false;
+            }
+            dataIndex.remove(bookmarkInfo.getTitle());
         } else if (null == this.bookmarkInfo) {
             return false;
         }
+        if (!dataFile.getParentFile().exists()) {
+            dataFile.getParentFile().mkdir();
+        }
         if (!dataFile.exists())
             dataFile.createNewFile();
-        // TODO 文件不存在会自动创建，但是目录不存在则会报错
-        OutputStream outputStream = new FileOutputStream(dataFile,true);
+        OutputStream outputStream = new FileOutputStream(dataFile,false);
         JsonWriter writer = new JsonWriter(new OutputStreamWriter(outputStream, "UTF-8"));
         writer.setIndent("    ");
         writer.beginObject();
@@ -49,6 +56,7 @@ public class DataManager {
     }
 
     public void readData() throws IOException {
+        if (!dataFile.exists()) return;
         Reader reader = new FileReader(dataFile);
         String title = null;
         String url = null;
@@ -92,7 +100,7 @@ public class DataManager {
         }
         Object[] di = dataIndex.keySet().toArray();
         for (int i= 0;i < di.length;i++) {
-            stringBuilder.append(di[i]);
+            stringBuilder.append(i + "." + di[i]);
             if (i < di.length-1) {
                 stringBuilder.append("\r\n");
             }
