@@ -1,7 +1,5 @@
 package tech.zuosi.bookmarkmanager.util;
 
-import java.awt.*;
-
 /**
  * Created by iwar on 2016/8/13.
  */
