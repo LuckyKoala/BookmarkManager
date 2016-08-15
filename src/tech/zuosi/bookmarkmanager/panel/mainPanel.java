@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import tech.zuosi.bookmarkmanager.data.BookmarkInfo;
 import tech.zuosi.bookmarkmanager.data.DataManager;
 import tech.zuosi.bookmarkmanager.listener.TextMenuListener;
+import tech.zuosi.bookmarkmanager.operator.PanelOperator;
 import tech.zuosi.bookmarkmanager.type.ModeType;
 import tech.zuosi.bookmarkmanager.util.TextUtil;
 
@@ -19,19 +20,19 @@ import java.io.IOException;
  * Created by iwar on 2016/3/12.
  */
 public class MainPanel extends JPanel {
-    private JLabel titleLab,urlLab,infoLab;
-    private JTextField title,url;
-    private JTextArea info;
-    private JButton readAndLoad,add,delete,edit,save,reload;
-    private JScrollPane scrollInfoPane;
-    private JLabel messageLab;
-    private GridBagLayout gridBagLayout;
-    private GridBagConstraints constraints;
-    private JTextArea content;
-    private JScrollPane scrollContentPane;
-    private TextMenuListener tml;
-    private Font textFont;
-    private String defaultInfo;
+    public static JLabel titleLab,urlLab,infoLab;
+    public static JTextField title,url;
+    public static JTextArea info;
+    public static JButton back,add,delete,edit,save,reload;
+    public static JScrollPane scrollInfoPane;
+    public static JLabel messageLab;
+    public static GridBagLayout gridBagLayout;
+    public static GridBagConstraints constraints;
+    public static JTextArea content;
+    public static JScrollPane scrollContentPane;
+    public static TextMenuListener tml;
+    public static Font textFont;
+    public static String defaultInfo;
     public static ModeType currentMode;
 
     public MainPanel() {
@@ -49,7 +50,7 @@ public class MainPanel extends JPanel {
         title = new JTextField(15);
         url = new JTextField(15);
         info = new JTextArea(5,15);
-        readAndLoad = new JButton("读取");
+        back = new JButton("返回");
         add = new JButton("添加");
         delete = new JButton("移除");
         edit = new JButton("编辑");
@@ -148,17 +149,17 @@ public class MainPanel extends JPanel {
                 title.setText("");
                 url.setText("");
                 info.setText("");
-                String alertMessage = "可以添加，移除，查看书签哦_(:з」∠)_\r\n内容已重置";
-                JOptionPane.showMessageDialog(this, alertMessage, "书签精灵QAQ", -1);
             }
         });
 
         this.reload.addActionListener((ActionEvent e) -> {
+            if ("".equals(url.getText()) || "".equals(title.getText()) || "".equals(info.getText())) {
+                messageLab.setText("内容为空,无需重置");
+                return;
+            }
             title.setText("");
             url.setText("");
             info.setText("");
-            String alertMessage = "可以添加，移除，查看书签哦_(:з」∠)_\r\n内容已重置";
-            JOptionPane.showMessageDialog(this, alertMessage, "书签精灵QAQ", -1);
             if ("".equals(url.getText()) || "".equals(title.getText()) || "".equals(info.getText()))
                 messageLab.setText("已经重置所有待录入的内容！");
         });
@@ -167,31 +168,18 @@ public class MainPanel extends JPanel {
             this.remove(edit);
             instanceConstraints(delete,2,6,3,2);
             this.remove(add);
-            instanceConstraints(readAndLoad,0,6,3,2);
+            instanceConstraints(back,0,6,3,2);
 
             this.updateUI();
 
             messageLab.setText("点击保存即可切换为新增模式");
-            String alertMessage = "双击选中然后选中读取或删除即可\r\n编辑完点击保存即可切换为新增模式，\r\n" +
-                    "在编辑模式下将无法新增书签\r\n么么扎_(:з」∠)_";
-            JOptionPane.showMessageDialog(this, alertMessage, "书签精灵0A0", -1);
 
             content.setText(new DataManager().listDataIndex());
             currentMode = ModeType.LIST;
 
-            this.readAndLoad.addActionListener(e2 -> {
-                String jsonString = DataManager.dataIndex.get(TextUtil.text);
-                if (jsonString == null) {
-                    messageLab.setText("请先双击选中一项数据");
-                    return;
-                }
-                content.setText(TextUtil.formatJson(jsonString));
-                currentMode = ModeType.INFO;
-                BookmarkInfo bookmarkInfo = new Gson().fromJson(jsonString,BookmarkInfo.class);
-                if (bookmarkInfo != null) {
-                    title.setText(bookmarkInfo.getTitle());
-                    url.setText(bookmarkInfo.getUrl());
-                    info.setText(bookmarkInfo.getContentInfo());
+            this.back.addActionListener(e2 -> {
+                if (!new PanelOperator().backToList()) {
+                    saveOperator();
                 }
             });
 
@@ -209,6 +197,9 @@ public class MainPanel extends JPanel {
                     new DataManager(new Gson().fromJson(DataManager.dataIndex.get(TextUtil.text),BookmarkInfo.class))
                             .removeBMI();
                     messageLab.setText("成功删除数据[" + TextUtil.shortString(TextUtil.text) + "]");
+                    title.setText("");
+                    url.setText("");
+                    info.setText("");
                     content.setText(new DataManager().listDataIndex());
                 } catch (IOException e2) {
                     e2.printStackTrace();
@@ -222,8 +213,6 @@ public class MainPanel extends JPanel {
                     messageLab.setText("内容为空,保持原有内容");
                 } else {
                     boolean hasWritten = false;
-                    System.out.println(info.getText());
-                    System.out.println(info.getSelectedText());
                     try {
                         hasWritten = new DataManager(new BookmarkInfo(url.getText(),
                                 title.getText(), info.getText())).writeData(true);
@@ -245,18 +234,22 @@ public class MainPanel extends JPanel {
                 return;
             }
 
-            content.setEditable(false);
-            content.setText(defaultInfo);
-            this.remove(delete);
-            instanceConstraints(edit,2,6,3,2);
-            this.remove(readAndLoad);
-            instanceConstraints(add,0,6,3,2);
-            this.updateUI();
-            currentMode = ModeType.NEW;
-            title.setText("");
-            url.setText("");
-            info.setText("");
+            saveOperator();
         });
+    }
+
+    public void saveOperator() {
+        content.setEditable(false);
+        content.setText(defaultInfo);
+        this.remove(delete);
+        instanceConstraints(edit,2,6,3,2);
+        this.remove(back);
+        instanceConstraints(add,0,6,3,2);
+        this.updateUI();
+        currentMode = ModeType.NEW;
+        title.setText("");
+        url.setText("");
+        info.setText("");
     }
 
     private void initComponent() {

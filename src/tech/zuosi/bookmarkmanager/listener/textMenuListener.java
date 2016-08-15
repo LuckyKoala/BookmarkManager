@@ -1,5 +1,6 @@
 package tech.zuosi.bookmarkmanager.listener;
 
+import tech.zuosi.bookmarkmanager.operator.PanelOperator;
 import tech.zuosi.bookmarkmanager.panel.MainPanel;
 import tech.zuosi.bookmarkmanager.type.ModeType;
 import tech.zuosi.bookmarkmanager.util.TextUtil;
@@ -50,10 +51,11 @@ public class TextMenuListener extends MouseAdapter implements CaretListener {
         if (ModeType.LIST == MainPanel.currentMode) {
             String tarTitle;
             if (me.getClickCount() == 2) {
-                String str = textArea.getText();
+                String str = textArea.getText()==null?"":textArea.getText();
                 String[] strArray = str.split("\n");
                 tarTitle = strArray[line].trim().split("\\.")[1];  //To Skip Index
                 TextUtil.text = tarTitle;
+                new PanelOperator().loadBMI();
             }
         }
     }
