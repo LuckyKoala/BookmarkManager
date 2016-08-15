@@ -1,0 +1,24 @@
+version: 0.0.1#4
+author: LuckyKoala
+update:
+  v1-2:
+  - "开始完善项目内容，更新至GitHub"
+  v2-3:
+  - "添加移除功能"
+  - "完善DataManager，以便其更好地适应添加、编辑和移除书签的功能"
+  - "更新提示栏的文字，更加清晰地告知使用者如何切换模式"
+  - "完善Manifest文件中MainClass的内容"
+  - "添加ModeType枚举类并应用，用以分辨当前所处模式"
+  - "加入try-with-resources"
+  - "readData()不再抛出异常"
+  v3-4:
+  - "美化列表的显示样式，自动将过长字符串换行"
+  - "完善移除功能的提示和判断机制"
+  - "保存之后清空输入栏的内容"
+  - "规范化类的命名"
+  - "分离UIpanel中变量的声明和初始化"
+  - "分离MainPanel中变量的声明和初始化"
+  - "SelectedText重命名为TextUtil"
+  - "删除了LimitTextListener"
+  - "完成了对输入框内容长度的闲置"
+  - "更改了部分提示文本"

@@ -1,8 +1,8 @@
 package tech.zuosi.bookmarkmanager.listener;
 
-import tech.zuosi.bookmarkmanager.SelectedText;
-import tech.zuosi.bookmarkmanager.panel.mainPanel;
+import tech.zuosi.bookmarkmanager.panel.MainPanel;
 import tech.zuosi.bookmarkmanager.type.ModeType;
+import tech.zuosi.bookmarkmanager.util.TextUtil;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
@@ -14,12 +14,12 @@ import java.awt.event.MouseEvent;
 /**
  * Created by iwar on 2016/3/19.
  */
-public class textMenuListener extends MouseAdapter implements CaretListener {
+public class TextMenuListener extends MouseAdapter implements CaretListener {
     //private boolean isEditMode;
     private JTextArea textArea;
     private int line;
 
-    public textMenuListener(JTextArea textArea) {
+    public TextMenuListener(JTextArea textArea) {
         this.textArea = textArea;
         //this.isEditMode = false;
     }
@@ -47,13 +47,13 @@ public class textMenuListener extends MouseAdapter implements CaretListener {
 
     @Override
     public void mouseClicked(MouseEvent me) {
-        if (ModeType.LIST == mainPanel.currentMode) {
+        if (ModeType.LIST == MainPanel.currentMode) {
             String tarTitle;
             if (me.getClickCount() == 2) {
                 String str = textArea.getText();
                 String[] strArray = str.split("\n");
                 tarTitle = strArray[line].trim().split("\\.")[1];  //To Skip Index
-                SelectedText.text = tarTitle;
+                TextUtil.text = tarTitle;
             }
         }
     }
