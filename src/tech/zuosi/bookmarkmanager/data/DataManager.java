@@ -43,7 +43,6 @@ public class DataManager {
             String preJson = dataIndex.get(bookmarkInfo.getTitle());
             BookmarkInfo pre = gson.fromJson(preJson,BookmarkInfo.class);
             if (pre.getBIID().equals(bookmarkInfo.getBIID())) {
-                System.out.println("pre:" + pre.getBIID() + " | " + "now:" + bookmarkInfo.getBIID());
                 return false;
             }
             dataIndex.replace(bookmarkInfo.getTitle(),preJson,gson.toJson(bookmarkInfo));
@@ -111,7 +110,7 @@ public class DataManager {
                         } else if ("contentinfo".equals(name)) {
                             info = jsonReader.nextString();
                         } else if ("BIID".equals(name)) {
-                            BIID = jsonReader.nextString();
+                            BIID = jsonReader.nextString(); //读取了但是没有用，可以考虑不写入这一信息
                         }
 
                     }
@@ -138,7 +137,7 @@ public class DataManager {
         readData();
         Object[] di = dataIndex.keySet().toArray();
         for (int i= 0;i < di.length;i++) {
-            stringBuilder.append(i + "." + di[i]);
+            stringBuilder.append("【" + i + "】." + di[i]);
             if (i < di.length-1) {
                 stringBuilder.append("\r\n");
             }

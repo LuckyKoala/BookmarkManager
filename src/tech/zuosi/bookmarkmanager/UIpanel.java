@@ -1,26 +1,31 @@
 package tech.zuosi.bookmarkmanager;
 
 
-import tech.zuosi.bookmarkmanager.panel.tabPane;
+import tech.zuosi.bookmarkmanager.panel.TabPane;
 
 import javax.swing.*;
 import java.awt.*;
+
+import static javax.swing.JFrame.EXIT_ON_CLOSE;
 
 /**
  * Created by iwar on 2016/3/4.
  */
 public class UIpanel {
-    private JFrame jFrame = new JFrame("书签管理器");
-    private Dimension dimension = new Dimension();
-    private Point point = new Point(300,200);
-    private JLabel jLabel = new JLabel("书签内容包括url、编号、标题与内容",JLabel.CENTER);
-    private Font topLabelFont = new Font("Serief",Font.BOLD + Font.ITALIC,40);
-    private Font buttonFont = new Font("Serief",Font.PLAIN,22);
-    private JButton addBookmark = new JButton("添加书签");
+    private JFrame jFrame;
+    private Dimension dimension;
+    private Point point;
+    private JLabel jLabel;
+    private Font topLabelFont,buttonFont;
+    private JButton addBookmark;
+
     public static void main(String[] args) {
         new UIpanel();
     }
+
     public UIpanel() {
+        init();
+
         addBookmark.setFont(buttonFont);
         addBookmark.setBounds(2,500,200,50);
         dimension.setSize(1100,768);
@@ -31,12 +36,21 @@ public class UIpanel {
         jFrame.setBackground(Color.WHITE);
         jFrame.setLocation(point);
         jFrame.setVisible(true);
-        jFrame.add(new tabPane());
+        jFrame.add(new TabPane());
         jFrame.pack();
         jFrame.setResizable(false);
+        this.jFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         // TODO 加入右键菜单（非必要）
         // TODO 加入快捷键
-        // TODO 重构，性能优化
-        //TODO 将各种功能封装
+    }
+
+    private void init() {
+        jFrame = new JFrame("书签管理器");
+        dimension = new Dimension();
+        point = new Point(300,200);
+        jLabel = new JLabel("书签内容包括url、编号、标题与内容",JLabel.CENTER);
+        topLabelFont = new Font("Serief",Font.BOLD + Font.ITALIC,40);
+        buttonFont = new Font("Serief",Font.PLAIN,22);
+        addBookmark = new JButton("添加书签");
     }
 }

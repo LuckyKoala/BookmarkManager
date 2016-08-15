@@ -6,7 +6,7 @@ import java.awt.*;
 /**
  * Created by iwar on 2016/3/12.
  */
-public class settingPanel extends JPanel {
+public class SettingPanel extends JPanel {
     private JLabel pathLab = new JLabel("存储格式");
     private JTextField path = new JTextField("./bookmarkinfo.json",15);
     private JButton apply = new JButton("应用");
@@ -14,7 +14,7 @@ public class settingPanel extends JPanel {
     private GridBagLayout gridBagLayout = new GridBagLayout();
     private GridBagConstraints gridBagConstraints = new GridBagConstraints();
 
-    public settingPanel() {
+    public SettingPanel() {
         // TODO 完善设置及其对应事件的处理机制
         // TODO 例如加入文件浏览器，方便选择数据文件存储路径
         this.setLayout(gridBagLayout);
