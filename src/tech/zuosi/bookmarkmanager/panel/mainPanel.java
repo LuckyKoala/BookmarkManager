@@ -23,7 +23,7 @@ public class MainPanel extends JPanel {
     public static JLabel titleLab,urlLab,infoLab;
     public static JTextField title,url;
     public static JTextArea info;
-    public static JButton back,add,delete,edit,save,reload;
+    public static JButton back,add,delete, data,save,reload;
     public static JScrollPane scrollInfoPane;
     public static JLabel messageLab;
     public static GridBagLayout gridBagLayout;
@@ -53,7 +53,7 @@ public class MainPanel extends JPanel {
         back = new JButton("返回");
         add = new JButton("添加");
         delete = new JButton("移除");
-        edit = new JButton("编辑");
+        data = new JButton("数据");
         save = new JButton("保存");
         reload = new JButton("重置");
         scrollInfoPane = new JScrollPane(info,
@@ -130,9 +130,7 @@ public class MainPanel extends JPanel {
     }
 
     private void initActionListener() {
-        //TODO 读取后，右边有内容的时候，增加一种可以保存该次修改而不直接退出编辑模式的按钮，最好更新更多按钮，将frame显示区域扩大
-        //? 多线程更新text
-        //FIXME 导出的jar直接运行似乎无法正常读取数据
+        //FIXME 单独Jar运行时，查看中文内容会产生乱码
         this.add.addActionListener(e -> {
             if (ModeType.NEW != currentMode)
                 return;
@@ -164,8 +162,8 @@ public class MainPanel extends JPanel {
                 messageLab.setText("已经重置所有待录入的内容！");
         });
 
-        this.edit.addActionListener(e -> {
-            this.remove(edit);
+        this.data.addActionListener(e -> {
+            this.remove(data);
             instanceConstraints(delete,2,6,3,2);
             this.remove(add);
             instanceConstraints(back,0,6,3,2);
@@ -178,9 +176,14 @@ public class MainPanel extends JPanel {
             currentMode = ModeType.LIST;
 
             this.back.addActionListener(e2 -> {
-                if (!new PanelOperator().backToList()) {
+                if (currentMode == ModeType.INFO) {
+                    if (!new PanelOperator().backToList()) {
+                        saveOperator();
+                    }
+                } else if (currentMode == ModeType.LIST) {
                     saveOperator();
                 }
+
             });
 
             this.delete.addActionListener(e1 -> {
@@ -201,6 +204,7 @@ public class MainPanel extends JPanel {
                     url.setText("");
                     info.setText("");
                     content.setText(new DataManager().listDataIndex());
+                    currentMode = ModeType.LIST;
                 } catch (IOException e2) {
                     e2.printStackTrace();
                 }
@@ -224,32 +228,30 @@ public class MainPanel extends JPanel {
 
                     if (hasWritten) {
                         messageLab.setText("数据[" + showTitle + "]存储完毕~");
+
+                        content.setText(new DataManager().listDataIndex());
+                        currentMode = ModeType.LIST;
                     } else {
                         messageLab.setText("内容相同，无需更新~");
                     }
                 }
             } else if (ModeType.LIST == currentMode) {
-                messageLab.setText("点击编辑按钮查看已有内容");
-            } else {
-                return;
+                messageLab.setText("双击数据即可读取");
             }
-
-            saveOperator();
         });
     }
 
     public void saveOperator() {
-        content.setEditable(false);
-        content.setText(defaultInfo);
-        this.remove(delete);
-        instanceConstraints(edit,2,6,3,2);
-        this.remove(back);
-        instanceConstraints(add,0,6,3,2);
-        this.updateUI();
-        currentMode = ModeType.NEW;
         title.setText("");
         url.setText("");
         info.setText("");
+        this.remove(delete);
+        this.remove(back);
+        instanceConstraints(data,2,6,3,2);
+        instanceConstraints(add,0,6,3,2);
+        this.updateUI();
+        content.setText(defaultInfo);
+        currentMode = ModeType.NEW;
     }
 
     private void initComponent() {
@@ -260,7 +262,7 @@ public class MainPanel extends JPanel {
         instanceConstraints(infoLab,0,4,1,2);
         instanceConstraints(scrollInfoPane,2,4,2,2);
         instanceConstraints(add,0,6,3,2);
-        instanceConstraints(edit,2,6,3,2);
+        instanceConstraints(data,2,6,3,2);
         instanceConstraints(save,0,8,3,2);
         instanceConstraints(reload,2,8,3,2);
         instanceConstraints(messageLab,0,10,5,3);

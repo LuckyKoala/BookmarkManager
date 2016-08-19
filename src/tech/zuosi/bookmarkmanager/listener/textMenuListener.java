@@ -53,7 +53,11 @@ public class TextMenuListener extends MouseAdapter implements CaretListener {
             if (me.getClickCount() == 2) {
                 String str = textArea.getText()==null?"":textArea.getText();
                 String[] strArray = str.split("\n");
-                tarTitle = strArray[line].trim().split("\\.")[1];  //To Skip Index
+                if (line >= strArray.length) {
+                    tarTitle = "";
+                } else {
+                    tarTitle = strArray[line].trim().split("\\.")[1];
+                }
                 TextUtil.text = tarTitle;
                 new PanelOperator().loadBMI();
             }

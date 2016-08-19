@@ -27,7 +27,7 @@ public class TextUtil {
 
             key = var3[0];
             value = var3[1];
-            value = formatString(value,30);
+            value = formatString(value,32);
 
             switch (key) {
                 case "BIID":
