@@ -31,15 +31,13 @@ public class PanelOperator {
     }
 
     public boolean backToList() {
-        String list;
-        MainPanel.title.setText("");
-        MainPanel.url.setText("");
-        MainPanel.info.setText("");
-        list = new DataManager().listDataIndex();
+        //MainPanel.title.setText("");
+        //MainPanel.url.setText("");
+        //MainPanel.info.setText("");
         if (DataManager.dataIndex.keySet().size() == 0) {
             return false;
         }
-        MainPanel.content.setText(list);
+        MainPanel.content.setText(new DataManager().listDataIndex());
         MainPanel.currentMode = ModeType.LIST;
         return true;
     }

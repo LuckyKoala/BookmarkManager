@@ -15,7 +15,6 @@ public class SettingPanel extends JPanel {
     private GridBagConstraints gridBagConstraints = new GridBagConstraints();
 
     public SettingPanel() {
-        // TODO 完善设置及其对应事件的处理机制
         // TODO 例如加入文件浏览器，方便选择数据文件存储路径
         this.setLayout(gridBagLayout);
         this.path.setEditable(false);

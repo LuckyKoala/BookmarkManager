@@ -18,7 +18,8 @@ public class DataManager {
     private Gson gson = new Gson();
     private BookmarkInfo bookmarkInfo;
     public static Map<String,String> dataIndex = new HashMap<>();
-    private File dataFile = new File("e:"+File.separator+"io"+File.separator+"bookmarkmanager.json");
+    private String s = "e:"+File.separator+"io"+File.separator+"bookmarkmanager.json";
+    private File dataFile = new File(s);
 
     public DataManager() {}
 
@@ -46,14 +47,15 @@ public class DataManager {
                 return false;
             }
             dataIndex.replace(bookmarkInfo.getTitle(),preJson,gson.toJson(bookmarkInfo));
-        } else if (null == this.bookmarkInfo) {
-            return false;
+        } else {
+            dataIndex.put(bookmarkInfo.getTitle(),gson.toJson(bookmarkInfo));
         }
         if (!dataFile.getParentFile().exists()) {
             dataFile.getParentFile().mkdir();
         }
-        if (!dataFile.exists())
+        if (!dataFile.exists()) {
             dataFile.createNewFile();
+        }
 
         writeBMI(append);
         return true;
@@ -132,7 +134,6 @@ public class DataManager {
     }
 
     public String listDataIndex() {
-        //FIXME 无内容时出现异常 EOFException
         StringBuilder stringBuilder = new StringBuilder();
         readData();
         Object[] di = dataIndex.keySet().toArray();
